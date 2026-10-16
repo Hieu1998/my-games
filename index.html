@@ -449,7 +449,9 @@
 /* ----- quân cờ ----- */
 .tp-tokens { position: absolute; inset: 0; pointer-events: none; }
 /* ----- xúc xắc 3D ----- */
-.c-dice { display: flex; align-items: center; justify-content: center; padding: 1.2cqw 0 1.8cqw; }
+.c-dice { display: flex; align-items: center; justify-content: center; gap: 3.2cqw; padding: 1.2cqw 0 1.8cqw; }
+.scene ~ .scene.toss { animation-delay: .09s; }
+.scene ~ .scene.toss .dshadow { animation-delay: .09s; }
 .scene { --ds: clamp(38px, 7.2cqw, 66px); position: relative; width: var(--ds); height: var(--ds); perspective: 520px; }
 .cube { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); will-change: transform; }
 .cf { position: absolute; inset: 0; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 12%; border-radius: 20%; backface-visibility: hidden; border: 1px solid #b8ab86;
@@ -732,7 +734,7 @@
     <details class="tp-rules">
       <summary>Luật chơi</summary>
       <ul>
-        <li>Đi theo chiều kim đồng hồ trên bản đồ 64 ô, tung 1 xúc xắc. Tung 6 được thêm lượt (ba lần 6 liên tiếp thì vào tù; đang ở tù tung 6 để ra). Mỗi lần qua Xuất phát nhận 250tr; dừng đúng ô Xuất phát được thưởng thêm 100tr.</li>
+        <li>Đi theo chiều kim đồng hồ trên bản đồ 64 ô, tung 2 xúc xắc. Tung ra đôi được thêm lượt (ba lần đôi liên tiếp thì vào tù; đang ở tù tung đôi để ra). Mỗi lần qua Xuất phát nhận 250tr; dừng đúng ô Xuất phát được thưởng thêm 100tr.</li>
         <li>Dừng ở ô chưa có chủ thì được mua. Nếu không mua, ô được đưa ra đấu giá cho tất cả người chơi.</li>
         <li>Xây nhà: sau khi mua một ô, mỗi lần bạn đi một vòng và dừng lại đúng ô đó, bạn được xây thêm một cấp (nhà 1 đến 4, khách sạn, rồi Địa danh). Mỗi lần dừng chỉ xây một cấp; lần sau quay lại xây tiếp. Tiền thuê tăng theo từng cấp.</li>
         <li>Trao đổi đất và tiền với người chơi khác (ô liên quan chưa được có nhà).</li>
@@ -2850,7 +2852,7 @@ function TPEngine() {
 
   function create(cfg) {
     var G = {
-      players: [], owner: [], houses: [], mort: [], turn: 0, phase: 'roll', die: 1, sixes: 0, buildSq: -1, extra: false,
+      players: [], owner: [], houses: [], mort: [], turn: 0, phase: 'roll', die: 2, dice: [1, 1], doubles: 0, buildSq: -1, extra: false,
       buy: -1, debt: null, afterDebt: 0, rentMult: 1, round: 1, chance: [], comm: [], ci: 0, mi: 0, log: [], logN: 0,
       winner: -1, seed: cfg.seed | 0, level: cfg.level || 'mid', pot: 0, fx: [], auction: null,
       maxRound: cfg.maxRound || 0, startCash: cfg.cash || 2000
@@ -2889,7 +2891,7 @@ function TPEngine() {
     } else if (s.t === 'st') base = 25 * Math.pow(2, countOwned(G, o, 'st') - 1) * G.rentMult;
     else if (s.t === 'ut') {
       var n = countOwned(G, o, 'ut');
-      base = (n >= 3 ? 40 : n === 2 ? 20 : 8) * G.die;
+      base = (n >= 3 ? 20 : n === 2 ? 10 : 4) * G.die;
     }
     return Math.round(base * fxMult(G, sq));
   }
@@ -2973,7 +2975,7 @@ function TPEngine() {
   function nextTurn(G) {
     var n = G.turn, old = n;
     do { n = (n + 1) % G.players.length; } while (G.players[n].bankrupt);
-    G.turn = n; G.sixes = 0; G.extra = false; G.phase = 'roll'; G.buildSq = -1;
+    G.turn = n; G.doubles = 0; G.extra = false; G.phase = 'roll'; G.buildSq = -1;
     if (n <= old) {
       G.round++;
       roundTick(G);
@@ -3124,12 +3126,12 @@ function TPEngine() {
 
   function roll(G) {
     var p = cur(G);
-    var d = 1 + rint(G, 6), six = d === 6;
-    G.die = d;
-    say(G, G.turn, p.name + ' tung được ' + d + (six ? ' (thêm lượt)' : '') + '.');
+    var d1 = 1 + rint(G, 6), d2 = 1 + rint(G, 6), d = d1 + d2, dbl = d1 === d2;
+    G.dice = [d1, d2]; G.die = d;
+    say(G, G.turn, p.name + ' tung ' + d1 + ' và ' + d2 + ' (tổng ' + d + (dbl ? ', đôi, thêm lượt' : '') + ').');
     G.extra = false; G.phase = 'moving';
     if (p.jail > 0) {
-      if (six) { p.jail = 0; say(G, G.turn, p.name + ' tung được 6 nên ra tù.'); doMove(G, d); return; }
+      if (dbl) { p.jail = 0; say(G, G.turn, p.name + ' tung được đôi nên ra tù.'); doMove(G, d); return; }
       if (p.jail >= 3) {
         p.jail = 0;
         say(G, G.turn, p.name + ' hết 3 lượt, nộp ' + BAIL + 'tr để ra tù.');
@@ -3144,15 +3146,15 @@ function TPEngine() {
       settle(G);
       return;
     }
-    if (six) {
-      G.sixes++;
-      if (G.sixes >= 3) {
-        say(G, G.turn, p.name + ' tung 6 ba lần liên tiếp.');
-        sendJail(G, p); G.sixes = 0; settle(G);
+    if (dbl) {
+      G.doubles++;
+      if (G.doubles >= 3) {
+        say(G, G.turn, p.name + ' tung đôi ba lần liên tiếp.');
+        sendJail(G, p); G.doubles = 0; settle(G);
         return;
       }
       G.extra = true;
-    } else G.sixes = 0;
+    } else G.doubles = 0;
     doMove(G, d);
   }
 
@@ -3415,7 +3417,7 @@ if (typeof module !== 'undefined') module.exports = TPEngine;
   var S = {
     seats: null, count: 4, level: 'mid', maxRound: 0, cash: 2000, tilt: false, sound: true,
     G: null, disp: [], busy: false, rolling: false, face: 1,
-    modal: null, hideOver: false, gen: 0, sig: '', started: false, timer: null, aiTimer: null, pick: null, cx: 0, cy: 0, anim: false, cashPrev: [], deltas: {}, popTimer: null
+    modal: null, hideOver: false, gen: 0, sig: '', started: false, timer: null, aiTimer: null, pick: null, cx: [0, 0], cy: [0, 0], anim: false, cashPrev: [], deltas: {}, popTimer: null
   };
 
   function $(id) { return document.getElementById(id); }
@@ -3521,7 +3523,11 @@ if (typeof module !== 'undefined') module.exports = TPEngine;
   function readSave() {
     try {
       var o = JSON.parse(localStorage.getItem('tp3-save') || 'null');
-      if (o && o.G && o.G.players && o.G.owner && o.G.owner.length === N && o.G.phase !== 'over') return o.G;
+      if (o && o.G && o.G.players && o.G.owner && o.G.owner.length === N && o.G.phase !== 'over') {
+        if (!o.G.dice) o.G.dice = [o.G.die || 1, 1];
+        o.G.doubles = o.G.doubles || 0;
+        return o.G;
+      }
     } catch (e) { /* ignore */ }
     return null;
   }
@@ -3638,13 +3644,14 @@ if (typeof module !== 'undefined') module.exports = TPEngine;
   }
 
   function cubeHTML() {
-    var f = '';
+    var f = '', out = '';
     for (var n = 1; n <= 6; n++) {
       var on = PIPS[n], p = '';
       for (var k = 1; k <= 9; k++) p += '<i' + (on.indexOf(k) >= 0 ? ' class="on"' : '') + '></i>';
       f += '<span class="cf f' + n + '">' + p + '</span>';
     }
-    return '<div class="scene" id="tpScene"><div class="cube" id="tpCube">' + f + '</div><span class="dshadow"></span></div><span class="sr" id="tpDieTxt"></span>';
+    for (var j = 0; j < 2; j++) out += '<div class="scene" id="tpScene' + j + '"><div class="cube" id="tpCube' + j + '">' + f + '</div><span class="dshadow"></span></div>';
+    return out + '<span class="sr" id="tpDieTxt"></span>';
   }
 
   function buildBoard() {
@@ -3656,7 +3663,8 @@ if (typeof module !== 'undefined') module.exports = TPEngine;
       h += '<span class="tk" data-p="' + i + '" style="--c:' + PCOL[i] + ';--dx:' + (((i % 3) - 1) * 1.1) + 'cqw;--dy:' + ((i < 3 ? -1 : 1) * 0.65) + 'cqw"><span class="tk-in">' + icoOf(i) + '</span></span>';
     }
     h += '</div><div class="pop" id="tpPop" hidden></div></div><div class="ov" id="tpOv"></div>';
-    var b0 = BASE[G.die] || BASE[1]; S.cx = b0[0]; S.cy = b0[1]; S.anim = false;
+    var dd = G.dice || [1, 1];
+    S.cx = [BASE[dd[0]][0], BASE[dd[1]][0]]; S.cy = [BASE[dd[0]][1], BASE[dd[1]][1]]; S.anim = false;
     $('tpPlay').innerHTML = h;
   }
 
@@ -3741,33 +3749,37 @@ if (typeof module !== 'undefined') module.exports = TPEngine;
   // ---------- xúc xắc 3D ----------
   function nextAngle(cur, t, spins) { return t + 360 * (Math.ceil((cur - t) / 360) + spins); }
   function renderDice() {
-    var c = $('tpCube');
-    if (!c) return;
-    $('tpDieTxt').textContent = 'Xúc xắc: ' + S.G.die;
+    var G = S.G, dd = G.dice || [1, 1];
+    if (!$('tpCube0')) return;
+    $('tpDieTxt').textContent = 'Xúc xắc: ' + dd[0] + ' và ' + dd[1];
     if (S.anim) return;
-    var b = BASE[S.G.die] || BASE[1];
-    S.cx = nextAngle(S.cx, b[0], 0); S.cy = nextAngle(S.cy, b[1], 0);
-    c.style.transition = 'none';
-    c.style.transform = 'rotateX(' + S.cx + 'deg) rotateY(' + S.cy + 'deg)';
-  }
-  function tumble(v, cb) {
-    var c = $('tpCube'), sc = $('tpScene'), gen = S.gen;
-    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!c) { cb(); return; }
-    var b = BASE[v] || BASE[1];
-    S.cx = nextAngle(S.cx, b[0], 2); S.cy = nextAngle(S.cy, b[1], 3);
-    S.anim = true;
-    if (!reduce) {
-      sc.classList.remove('toss'); void sc.offsetWidth; sc.classList.add('toss');
-      for (var k = 0; k < 7; k++) (function (kk) { setTimeout(function () { if (gen === S.gen && S.anim) sfx('roll'); }, kk * 150); })(k);
+    for (var j = 0; j < 2; j++) {
+      var b = BASE[dd[j]] || BASE[1], c = $('tpCube' + j);
+      S.cx[j] = nextAngle(S.cx[j], b[0], 0); S.cy[j] = nextAngle(S.cy[j], b[1], 0);
+      c.style.transition = 'none';
+      c.style.transform = 'rotateX(' + S.cx[j] + 'deg) rotateY(' + S.cy[j] + 'deg)';
     }
-    void c.offsetWidth;
-    c.style.transition = reduce ? 'none' : 'transform 1.25s cubic-bezier(.14,.72,.2,1)';
-    c.style.transform = 'rotateX(' + S.cx + 'deg) rotateY(' + S.cy + 'deg)';
+  }
+  function tumble(vals, cb) {
+    var gen = S.gen;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!$('tpCube0')) { cb(); return; }
+    S.anim = true;
+    for (var j = 0; j < 2; j++) {
+      var b = BASE[vals[j]] || BASE[1], c = $('tpCube' + j), sc = $('tpScene' + j);
+      S.cx[j] = nextAngle(S.cx[j], b[0], 2 + j); S.cy[j] = nextAngle(S.cy[j], b[1], 3 - j);
+      if (!reduce) { sc.classList.remove('toss'); void sc.offsetWidth; sc.classList.add('toss'); }
+      void c.offsetWidth;
+      c.style.transition = reduce ? 'none' : 'transform ' + (1.25 + j * 0.15) + 's cubic-bezier(.14,.72,.2,1)';
+      c.style.transform = 'rotateX(' + S.cx[j] + 'deg) rotateY(' + S.cy[j] + 'deg)';
+    }
+    if (!reduce) for (var k = 0; k < 8; k++) (function (kk) { setTimeout(function () { if (gen === S.gen && S.anim) sfx('roll'); }, kk * 140); })(k);
     S.timer = setTimeout(function () {
       if (gen !== S.gen) return;
-      S.anim = false; sc.classList.remove('toss'); cb();
-    }, reduce ? 40 : 1450);
+      S.anim = false;
+      for (var q = 0; q < 2; q++) $('tpScene' + q).classList.remove('toss');
+      cb();
+    }, reduce ? 40 : 1600);
   }
 
   function canManageHuman() {
@@ -3873,7 +3885,7 @@ if (typeof module !== 'undefined') module.exports = TPEngine;
       return r + '<span>Phí xây mỗi nhà / khách sạn</span><span>' + fmt(s.h) + '</span><span>Phí xây Địa danh</span><span>' + fmt(s.h * 2) + '</span></div>';
     }
     if (s.t === 'st') return '<div class="pm-tbl"><span>1 ga</span><span>25tr</span><span>2 ga</span><span>50tr</span><span>3 ga</span><span>100tr</span><span>4 ga</span><span>200tr</span></div>';
-    if (s.t === 'ut') return '<div class="pm-tbl"><span>1 công ty</span><span>8 × xúc xắc</span><span>2 công ty</span><span>20 × xúc xắc</span><span>3 công ty</span><span>40 × xúc xắc</span></div>';
+    if (s.t === 'ut') return '<div class="pm-tbl"><span>1 công ty</span><span>4 × tổng xúc xắc</span><span>2 công ty</span><span>10 × tổng xúc xắc</span><span>3 công ty</span><span>20 × tổng xúc xắc</span></div>';
     return '';
   }
 
@@ -4077,7 +4089,7 @@ if (typeof module !== 'undefined') module.exports = TPEngine;
         S.timer = setTimeout(next, st.t);
       })();
     }
-    if (a.a === 'roll') tumble(G.die, move); else { renderDice(); move(); }
+    if (a.a === 'roll') tumble(G.dice, move); else { renderDice(); move(); }
   }
 
   function pump() {
