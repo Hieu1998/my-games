@@ -571,6 +571,70 @@
   .tk, .tp-board, .cube { transition: none !important; }
 }
 </style>
+<style>
+/* ================= Cờ Cá Ngựa ================= */
+:root { --lg-bg: #f3e7c8; --lg-cell: #fffdf5; --lg-line: #9d8b5f; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --lg-bg: #2b2a22; --lg-cell: #3a382d; --lg-line: #8f8460; }
+}
+:root[data-theme="dark"] { --lg-bg: #2b2a22; --lg-cell: #3a382d; --lg-line: #8f8460; }
+
+#view-ludo .app { max-width: 1280px; grid-template-columns: minmax(0, 1fr) 370px; }
+@media (max-width: 980px) { #view-ludo .app { grid-template-columns: minmax(0, 1fr); } }
+#view-ludo .top .alt { letter-spacing: 0.12em; }
+.lg-colname { font-size: 12px; font-weight: 700; letter-spacing: .04em; min-width: 62px; }
+
+.lg-wrap { display: flex; flex-direction: column; gap: 12px; width: min(100%, max(300px, calc(100vh - 250px))); width: min(100%, max(300px, calc(100dvh - 250px))); max-width: 780px; margin-inline: auto; }
+.lg-board { position: relative; width: 100%; aspect-ratio: 1; container-type: inline-size; border-radius: 18px; overflow: hidden; background: var(--lg-bg); border: 3px solid var(--lg-line); box-shadow: 0 40px 60px -36px rgba(0,0,0,.7), inset 0 0 0 3px rgba(255,255,255,.25); }
+.lg-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.lg-tokens, .lg-hints { position: absolute; inset: 0; pointer-events: none; }
+.lg-hints { z-index: 2; }
+
+.lg-tk { position: absolute; width: 5.4cqw; aspect-ratio: 1; padding: 0; margin: 0; border: 0; background: none; font: inherit; color: inherit; pointer-events: none;
+  transform: translate(calc(-50% + var(--dx, 0cqw)), calc(-50% + var(--dy, 0cqw))) scale(var(--sc, 1)); transition: left .3s cubic-bezier(.4,0,.3,1), top .3s cubic-bezier(.4,0,.3,1), transform .25s; z-index: 3; }
+.lg-tk::before { content: ''; position: absolute; left: 10%; right: 10%; bottom: -12%; height: 22%; border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,.5), transparent); }
+.lg-tk-in { position: relative; display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; border-radius: 50%; font-size: 3.4cqw; line-height: 1;
+  background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.85), transparent 52%), color-mix(in srgb, var(--c) 38%, #fff); border: .42cqw solid var(--c); box-shadow: 0 .7cqw 1.1cqw rgba(0,0,0,.45), inset 0 -.5cqw .7cqw rgba(0,0,0,.14); }
+.lg-tk.turn .lg-tk-in { box-shadow: 0 0 0 .22cqw var(--fg), 0 .7cqw 1.1cqw rgba(0,0,0,.45); }
+.lg-tk.can { pointer-events: auto; cursor: pointer; }
+.lg-tk.can .lg-tk-in { animation: lgPulse 1s ease-in-out infinite; box-shadow: 0 0 0 .4cqw var(--fg), 0 0 2.2cqw var(--c), 0 .7cqw 1.1cqw rgba(0,0,0,.45); }
+.lg-tk:focus-visible { outline: none; }
+.lg-tk:focus-visible .lg-tk-in { outline: 3px solid var(--accent); outline-offset: 2px; }
+.lg-tk-in.hop { animation: lgHop .3s cubic-bezier(.3,.7,.4,1); }
+.lg-tk-in.land { animation: lgLand .5s cubic-bezier(.3,.8,.4,1); }
+.lg-tk-in.land::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: .3cqw solid var(--c); animation: lgRing .6s ease-out both; }
+.lg-tk-in.hit { animation: lgHit .5s ease-in-out; }
+@keyframes lgPulse { 50% { transform: translateY(-.7cqw) scale(1.1); } }
+@keyframes lgHop { 0% { transform: translateY(0); } 40% { transform: translateY(-2.4cqw) scale(1.12); } 80% { transform: translateY(0) scale(1.1, .88); } 100% { transform: translateY(0); } }
+@keyframes lgLand { 0% { transform: translateY(-1.8cqw) scale(1.1); } 45% { transform: translateY(0) scale(1.22, .8); } 70% { transform: scale(.94, 1.08); } 100% { transform: scale(1); } }
+@keyframes lgRing { from { transform: scale(1); opacity: .9; } to { transform: scale(2.4); opacity: 0; } }
+@keyframes lgHit { 0%, 100% { transform: rotate(0); filter: none; } 20% { transform: rotate(-18deg) scale(1.15); filter: brightness(1.6) saturate(2); } 40% { transform: rotate(16deg) scale(1.15); } 60% { transform: rotate(-10deg); } 80% { transform: rotate(6deg); } }
+
+.lg-hint { position: absolute; width: 5.2cqw; aspect-ratio: 1; padding: 0; margin: 0; transform: translate(-50%, -50%); border-radius: 50%; border: .5cqw dashed var(--c); background: color-mix(in srgb, var(--c) 28%, transparent); pointer-events: auto; cursor: pointer; animation: lgHint 1.1s ease-in-out infinite; }
+@keyframes lgHint { 50% { transform: translate(-50%, -50%) scale(1.18); background: color-mix(in srgb, var(--c) 50%, transparent); } }
+
+.lg-bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; min-height: 76px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 14px 24px -20px rgba(0,0,0,.5); }
+.lg-dice { flex: none; display: flex; align-items: center; justify-content: center; width: 70px; container-type: inline-size; }
+.lg-bar .scene { --ds: 46px; }
+.lg-turn { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+.lg-turn b { display: flex; align-items: center; gap: 8px; font-size: 15px; }
+.lg-turn small { color: var(--muted); font-weight: 500; }
+.lg-msg { color: var(--fg); }
+.lg-last { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lg-btns { flex: none; display: flex; gap: 8px; }
+@media (max-width: 520px) { .lg-bar { flex-wrap: wrap; } .lg-btns { width: 100%; } .lg-btns .btn { flex: 1; } .lg-last { display: none; } }
+
+.lg-pips { display: flex; gap: 4px; margin-top: 4px; }
+.lg-pips b { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--pc); background: transparent; display: block; }
+.lg-pips b.t { background: color-mix(in srgb, var(--pc) 45%, transparent); }
+.lg-pips b.h { background: var(--pc); box-shadow: 0 0 0 2px color-mix(in srgb, var(--pc) 30%, transparent); }
+#lgPlayers .pl { cursor: default; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-tk-in, .lg-tk.can .lg-tk-in, .lg-hint { animation: none !important; }
+  .lg-tk { transition: none; }
+}
+</style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
@@ -703,6 +767,35 @@
       </div>
       <div class="foot"><span class="tag ok">Chơi được</span><span class="go" aria-hidden="true">Vào chơi →</span></div>
     </a>
+    <a class="card" style="--i:3" href="#ca-ngua" data-open="ca-ngua">
+      <svg class="logo" viewBox="0 0 96 96" aria-hidden="true">
+        <defs><clipPath id="lgClip"><rect width="96" height="96" rx="16"/></clipPath></defs>
+        <g clip-path="url(#lgClip)">
+          <rect width="96" height="96" fill="#f3e7c8"/>
+          <rect x="0" y="0" width="38" height="38" fill="#e0453b"/><rect x="58" y="0" width="38" height="38" fill="#2fa75f"/>
+          <rect x="58" y="58" width="38" height="38" fill="#f2b91c"/><rect x="0" y="58" width="38" height="38" fill="#2c7be0"/>
+          <rect x="6" y="6" width="26" height="26" rx="6" fill="#fffdf5"/><rect x="64" y="6" width="26" height="26" rx="6" fill="#fffdf5"/>
+          <rect x="64" y="64" width="26" height="26" rx="6" fill="#fffdf5"/><rect x="6" y="64" width="26" height="26" rx="6" fill="#fffdf5"/>
+          <rect x="38" y="0" width="20" height="96" fill="#fffdf5" stroke="#9d8b5f" stroke-width="1"/><rect x="0" y="38" width="96" height="20" fill="#fffdf5" stroke="#9d8b5f" stroke-width="1"/>
+          <polygon points="38,38 58,38 48,48" fill="#2fa75f"/><polygon points="58,38 58,58 48,48" fill="#f2b91c"/>
+          <polygon points="38,58 58,58 48,48" fill="#2c7be0"/><polygon points="38,38 38,58 48,48" fill="#e0453b"/>
+        </g>
+        <g class="lg-pawn">
+          <circle cx="19" cy="19" r="9" fill="#ffd9d5" stroke="#e0453b" stroke-width="3"/>
+          <text x="19" y="19.5" text-anchor="middle" dominant-baseline="central" font-size="11">🐎</text>
+        </g>
+        <g transform="translate(66 62)"><g class="lg-a">
+          <rect width="17" height="17" rx="3.5" fill="#fbf7ec" stroke="#1b1a17" stroke-width="1.2"/>
+          <circle cx="4.5" cy="4.5" r="1.6" fill="#1b1a17"/><circle cx="12.5" cy="4.5" r="1.6" fill="#1b1a17"/><circle cx="8.5" cy="8.5" r="1.6" fill="#1b1a17"/>
+          <circle cx="4.5" cy="12.5" r="1.6" fill="#1b1a17"/><circle cx="12.5" cy="12.5" r="1.6" fill="#1b1a17"/>
+        </g></g>
+      </svg>
+      <div>
+        <h2>Cờ Cá Ngựa</h2>
+        <p>2–4 người: tung 6 để xuất chuồng, đá ngựa đối thủ, dựng hàng rào và đưa 4 ngựa về đích đầu tiên.</p>
+      </div>
+      <div class="foot"><span class="tag ok">Chơi được</span><span class="go" aria-hidden="true">Vào chơi →</span></div>
+    </a>
   </div>
 </div>
 
@@ -747,6 +840,45 @@
   </section>
 </div>
 <div id="tpModal" class="tp-modal" hidden></div>
+</div>
+
+<div id="view-ludo" hidden>
+<div class="app">
+  <nav class="crumb"><button type="button" class="back" data-nav="home">← Tất cả game</button></nav>
+  <header class="top">
+    <h1>Cờ Cá Ngựa</h1>
+    <span class="alt">Ludo · 2–4 người</span>
+  </header>
+
+  <main class="board-wrap">
+    <div id="lgSetup" class="tp-setup"></div>
+    <div id="lgPlay" class="lg-wrap" hidden></div>
+  </main>
+
+  <section class="panel">
+    <div class="pl-list" id="lgPlayers" hidden></div>
+    <div class="actions" id="lgActions" hidden>
+      <button type="button" class="btn primary" data-lg="setup">Ván mới</button>
+      <button type="button" class="btn tg" data-lg="snd" id="lgSndBtn" aria-pressed="true">Âm thanh</button>
+    </div>
+    <div class="moves" id="lgLogBox" hidden>
+      <h2 class="label">Nhật ký</h2>
+      <ol class="tp-log" id="lgLog"></ol>
+    </div>
+    <details class="tp-rules">
+      <summary>Luật chơi</summary>
+      <ul>
+        <li>Mỗi người có 4 con ngựa, bắt đầu trong chuồng. Tung 1 xúc xắc; tung <b>6</b> mới được đưa một ngựa ra ô xuất phát của màu mình.</li>
+        <li>Ngựa đi theo chiều kim đồng hồ một vòng quanh bàn, rồi rẽ vào đường về đích của màu mình. Phải tung <b>đúng số</b> mới vào được ô đích; nếu thừa thì không đi được con đó.</li>
+        <li>Đáp xuống ô có ngựa của đối thủ thì đá ngựa đó về chuồng. Ô xuất phát và ô có ngôi sao là ô an toàn, không bị đá (riêng ngựa mới xuất chuồng vẫn đá được ngựa đối thủ đang đứng ở ô xuất phát của mình).</li>
+        <li>Hai ngựa cùng màu đứng chung một ô tạo thành <b>hàng rào</b>: ngựa đối thủ không thể đi qua hay dừng vào ô đó.</li>
+        <li>Được tung thêm lượt khi: tung 6, đá được ngựa đối thủ, hoặc đưa một ngựa về đích. Tung 6 ba lần liên tiếp thì mất lượt.</li>
+        <li>Nếu không có nước đi hợp lệ thì mất lượt. Khi chỉ có một nước đi, game tự đi giúp bạn.</li>
+        <li>Ai đưa đủ 4 ngựa về đích trước là người thắng.</li>
+      </ul>
+    </details>
+  </section>
+</div>
 </div>
 
 <div id="view-xiangqi" hidden>
@@ -4188,11 +4320,829 @@ if (typeof module !== 'undefined') module.exports = TPEngine;
 })();
 </script>
 <script>
+function LudoEngine() {
+  'use strict';
+  // Cờ Cá Ngựa. Vị trí tương đối của một con ngựa (rel): -1 = trong chuồng, 0..50 = trên đường đua chung
+  // (0 là ô xuất phát của màu mình), 51..55 = đường về đích riêng, 56 = đã về đích.
+  var NT = 52, HOME = 56;
+  var SAFE = {};
+  [0, 13, 26, 39, 8, 21, 34, 47].forEach(function (i) { SAFE[i] = 1; });
+  var COLS_BY_N = { 2: [0, 2], 3: [0, 1, 2], 4: [0, 1, 2, 3] };
+  var CN = ['Đỏ', 'Xanh lá', 'Vàng', 'Xanh dương'];
+
+  function rnd(G) {
+    G.seed = (G.seed + 0x6D2B79F5) | 0;
+    var t = Math.imul(G.seed ^ (G.seed >>> 15), 1 | G.seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+  function rint(G, n) { return (rnd(G) * n) | 0; }
+  function say(G, p, t) { G.log.push({ p: p, t: t }); G.logN++; if (G.log.length > 120) G.log.shift(); }
+
+  function create(cfg) {
+    var n = cfg.players.length, cols = COLS_BY_N[n];
+    var G = {
+      n: n, players: [], pcs: [], turn: 0, phase: 'roll', die: 0, sixes: 0, legal: [], last: null,
+      log: [], logN: 0, winner: -1, seed: cfg.seed | 0, level: cfg.level || 'mid', round: 1
+    };
+    cfg.players.forEach(function (p, i) {
+      G.players.push({ id: i, name: p.name, ai: !!p.ai, ico: p.ico || '', col: cols[i] });
+      G.pcs.push([-1, -1, -1, -1]);
+    });
+    say(G, -1, 'Ván mới bắt đầu. Tung 6 để đưa ngựa ra khỏi chuồng.');
+    say(G, 0, G.players[0].name + ' đi trước.');
+    return G;
+  }
+
+  function startOf(G, pid) { return G.players[pid].col * 13; }
+  function gsq(G, pid, rel) { return (startOf(G, pid) + rel) % NT; }
+
+  function occupants(G, g) {
+    var m = {};
+    for (var q = 0; q < G.players.length; q++) {
+      for (var j = 0; j < 4; j++) {
+        var r = G.pcs[q][j];
+        if (r >= 0 && r <= 50 && gsq(G, q, r) === g) m[q] = (m[q] || 0) + 1;
+      }
+    }
+    return m;
+  }
+  function blockedBy(G, pid, g) {
+    var m = occupants(G, g);
+    for (var k in m) if (+k !== pid && m[k] >= 2) return true;
+    return false;
+  }
+
+  function legalMoves(G, pid, d) {
+    var res = [], seen = {}, pcs = G.pcs[pid], pc;
+    for (pc = 0; pc < 4; pc++) {
+      var rel = pcs[pc];
+      if (rel >= HOME || seen[rel]) continue;
+      seen[rel] = 1;
+      var to;
+      if (rel < 0) { if (d !== 6) continue; to = 0; }
+      else { to = rel + d; if (to > HOME) continue; }
+      var ok = true, k, lo = rel < 0 ? 0 : rel + 1, hi = Math.min(to, 50);
+      for (k = lo; k <= hi; k++) if (blockedBy(G, pid, gsq(G, pid, k))) { ok = false; break; }
+      if (!ok) continue;
+      var cap = [];
+      if (to <= 50) {
+        var g = gsq(G, pid, to), occ = occupants(G, g);
+        if (!SAFE[g] || to === 0) {
+          for (var q in occ) {
+            if (+q === pid) continue;
+            for (var j = 0; j < 4; j++) {
+              var r2 = G.pcs[+q][j];
+              if (r2 >= 0 && r2 <= 50 && gsq(G, +q, r2) === g) cap.push({ pid: +q, pc: j, rel: r2 });
+            }
+          }
+        }
+      }
+      res.push({ pc: pc, from: rel, to: to, cap: cap });
+    }
+    return res;
+  }
+
+  function nextTurn(G) {
+    var old = G.turn;
+    G.turn = (G.turn + 1) % G.players.length;
+    if (G.turn <= old) G.round++;
+    G.sixes = 0; G.phase = 'roll'; G.legal = [];
+  }
+
+  function doRoll(G) {
+    var p = G.players[G.turn], d = 1 + rint(G, 6);
+    G.die = d; G.last = null;
+    if (d === 6) G.sixes++; else G.sixes = 0;
+    say(G, G.turn, p.name + ' tung được ' + d + (d === 6 ? ' (được tung thêm)' : '') + '.');
+    if (G.sixes >= 3) {
+      say(G, G.turn, p.name + ' tung 6 ba lần liên tiếp nên mất lượt.');
+      nextTurn(G); return;
+    }
+    G.legal = legalMoves(G, G.turn, d);
+    if (!G.legal.length) {
+      say(G, G.turn, p.name + ' không có nước đi nào.');
+      nextTurn(G); return;
+    }
+    G.phase = 'move';
+  }
+
+  function findMove(G, pc) {
+    var i, rel = G.pcs[G.turn][pc];
+    for (i = 0; i < G.legal.length; i++) if (G.legal[i].pc === pc) return G.legal[i];
+    for (i = 0; i < G.legal.length; i++) if (G.legal[i].from === rel) return G.legal[i];
+    return null;
+  }
+
+  function doMove(G, mv) {
+    var pid = G.turn, p = G.players[pid];
+    G.pcs[pid][mv.pc] = mv.to;
+    var caps = mv.cap.map(function (c) { return { pid: c.pid, pc: c.pc, rel: c.rel }; });
+    caps.forEach(function (c) { G.pcs[c.pid][c.pc] = -1; });
+    G.last = { pid: pid, pc: mv.pc, from: mv.from, to: mv.to, cap: caps };
+    if (mv.from < 0) say(G, pid, p.name + ' đưa một ngựa ra khỏi chuồng.');
+    else if (mv.to === HOME) say(G, pid, p.name + ' đưa một ngựa về đích.');
+    else say(G, pid, p.name + ' đi một ngựa ' + G.die + ' bước.');
+    if (caps.length) {
+      var names = {};
+      caps.forEach(function (c) { names[G.players[c.pid].name] = 1; });
+      say(G, pid, p.name + ' đá ' + caps.length + ' ngựa của ' + Object.keys(names).join(', ') + ' về chuồng!');
+    }
+    G.legal = [];
+    if (G.pcs[pid].every(function (r) { return r === HOME; })) {
+      G.phase = 'over'; G.winner = pid;
+      say(G, pid, p.name + ' đưa đủ 4 ngựa về đích và chiến thắng!');
+      return;
+    }
+    if (G.die === 6 || caps.length || mv.to === HOME) {
+      G.phase = 'roll';
+      say(G, pid, p.name + ' được tung thêm một lượt.');
+    } else nextTurn(G);
+  }
+
+  function act(G, a) {
+    if (G.phase === 'over') return false;
+    if (a.a === 'roll') { if (G.phase !== 'roll') return false; doRoll(G); return true; }
+    if (a.a === 'move') {
+      if (G.phase !== 'move') return false;
+      var mv = findMove(G, a.pc);
+      if (!mv) return false;
+      doMove(G, mv); return true;
+    }
+    return false;
+  }
+
+  // ---------- thống kê ----------
+  function progress(G, pid) {
+    var s = 0;
+    G.pcs[pid].forEach(function (r) { s += r < 0 ? 0 : r + 1; });
+    return s;
+  }
+  function homeCount(G, pid) { return G.pcs[pid].filter(function (r) { return r === HOME; }).length; }
+  function standings(G) {
+    return G.players.map(function (p) { return { id: p.id, home: homeCount(G, p.id), prog: progress(G, p.id) }; })
+      .sort(function (a, b) { return (b.home - a.home) || (b.prog - a.prog); });
+  }
+
+  // ---------- AI ----------
+  function risk(G, pid, g, rel) {
+    // xác suất bị đá ở ô g (toàn cục) nhân giá trị con ngựa
+    if (g < 0) return 0;
+    var occ = occupants(G, g), me = occ[pid] || 0;
+    if (me >= 1) return 0; // đã có đồng đội cùng ô: thành hàng rào
+    var threats = 0;
+    for (var q = 0; q < G.players.length; q++) {
+      if (q === pid) continue;
+      var stable = false;
+      for (var j = 0; j < 4; j++) {
+        var r = G.pcs[q][j];
+        if (r === -1) stable = true;
+        if (r < 0 || r > 50) continue;
+        var gq = gsq(G, q, r), dist = (g - gq + NT) % NT;
+        if (dist >= 1 && dist <= 6 && r + dist <= 50 && !SAFE[g]) threats++;
+      }
+      if (stable && g === startOf(G, q)) threats++;
+    }
+    return Math.min(1, threats * 0.17) * (10 + rel * 1.2);
+  }
+
+  function pickMove(G) {
+    var pid = G.turn, lv = G.level, L = G.legal, i, best = null, bs = -1e9;
+    if (L.length === 1) return L[0];
+    if (lv === 'easy') {
+      var caps = L.filter(function (m) { return m.cap.length; });
+      if (caps.length && rnd(G) < 0.5) return caps[rint(G, caps.length)];
+      return L[rint(G, L.length)];
+    }
+    var wd = lv === 'hard' ? 1.2 : 0.7, noise = lv === 'hard' ? 0 : 8;
+    var outCount = G.pcs[pid].filter(function (r) { return r >= 0 && r < HOME; }).length;
+    for (i = 0; i < L.length; i++) {
+      var m = L[i], s = 0;
+      if (m.to === HOME) s += 100;
+      if (m.cap.length) {
+        s += 60;
+        m.cap.forEach(function (c) { s += c.rel * 1.2; });
+      }
+      if (m.from < 0) s += 45 + (outCount === 0 ? 25 : 0);
+      if (m.to > 50 && m.to < HOME) s += 18;
+      s += (m.to - Math.max(0, m.from)) * 0.8;
+      var before = m.from >= 0 && m.from <= 50 ? risk(G, pid, gsq(G, pid, m.from), m.from) : 0;
+      var after = 0;
+      if (m.to <= 50) {
+        var g = gsq(G, pid, m.to);
+        G.pcs[pid][m.pc] = m.to;
+        var removed = m.cap.map(function (c) { var o = G.pcs[c.pid][c.pc]; G.pcs[c.pid][c.pc] = -1; return o; });
+        after = risk(G, pid, g, m.to);
+        G.pcs[pid][m.pc] = m.from;
+        m.cap.forEach(function (c, k) { G.pcs[c.pid][c.pc] = removed[k]; });
+        if (SAFE[g]) s += 12;
+        var occ = occupants(G, g);
+        if (occ[pid]) s += 8;
+      }
+      s += (before - after) * wd;
+      s += (rnd(G) - 0.5) * noise;
+      if (s > bs) { bs = s; best = m; }
+    }
+    return best;
+  }
+
+  function aiChoose(G) {
+    if (G.phase === 'roll') return { a: 'roll' };
+    if (G.phase === 'move') { var m = pickMove(G); return { a: 'move', pc: m.pc }; }
+    return null;
+  }
+
+  return {
+    NT: NT, HOME: HOME, SAFE: SAFE, CN: CN, COLS_BY_N: COLS_BY_N,
+    create: create, act: act, aiChoose: aiChoose, legalMoves: legalMoves, gsq: gsq, startOf: startOf,
+    progress: progress, homeCount: homeCount, standings: standings, occupants: occupants
+  };
+}
+if (typeof module !== 'undefined') module.exports = LudoEngine;
+
+</script>
+<script>
+(function () {
+  'use strict';
+  var LG = LudoEngine(), NT = LG.NT, HOME = LG.HOME;
+  var COL = ['#e0453b', '#2fa75f', '#f2b91c', '#2c7be0'];
+  var COLN = ['Đỏ', 'Xanh lá', 'Vàng', 'Xanh dương'];
+  var LICO = ['🐎', '🦄', '🐴', '🐲', '🐯', '🐘', '🦊', '🐼', '🐸', '🐢', '🐱', '🐶', '🦁', '🐵', '🐰', '🦆'];
+  var PIPS = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
+  var BASE = { 1: [0, 0], 2: [0, -90], 3: [-90, 0], 4: [90, 0], 5: [0, 90], 6: [0, 180] };
+  var LV = { easy: 'Dễ', mid: 'Vừa', hard: 'Khó' };
+  var STEP = 300, FLY = 700;
+
+  var S = {
+    seats: null, count: 4, level: 'mid', sound: true, G: null, disp: [], busy: false, anim: false, cx: 0, cy: 0,
+    gen: 0, timer: null, aiTimer: null, pick: null, started: false, hideOver: false
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function root() { return $('view-ludo'); }
+  function visible() { return !root().hidden; }
+  function btn(label, a, cls, extra) { return '<button type="button" class="btn' + (cls ? ' ' + cls : '') + '" data-lg="' + a + '"' + (extra || '') + '>' + label + '</button>'; }
+  function colOf(pid) { return S.G ? S.G.players[pid].col : [0, 1, 2, 3][pid]; }
+  function icoOf(pid) {
+    var p = S.G && S.G.players[pid];
+    return (p && p.ico) || (S.seats && S.seats[pid] && S.seats[pid].ico) || LICO[pid];
+  }
+  function chip(pid, col) {
+    var c = col !== undefined ? col : colOf(pid);
+    return '<span class="pdot" style="--c:' + COL[c] + '">' + icoOf(pid) + '</span>';
+  }
+
+  // ---------- hình học ----------
+  var TRACK = (function () {
+    var p = [], i;
+    function add(c, r) { p.push([c, r]); }
+    for (i = 1; i <= 5; i++) add(i, 6);
+    for (i = 5; i >= 0; i--) add(6, i);
+    add(7, 0); add(8, 0);
+    for (i = 1; i <= 5; i++) add(8, i);
+    for (i = 9; i <= 14; i++) add(i, 6);
+    add(14, 7); add(14, 8);
+    for (i = 13; i >= 9; i--) add(i, 8);
+    for (i = 9; i <= 14; i++) add(8, i);
+    add(7, 14); add(6, 14);
+    for (i = 13; i >= 9; i--) add(6, i);
+    for (i = 5; i >= 0; i--) add(i, 8);
+    add(0, 7); add(0, 6);
+    if (p.length !== NT) throw new Error('bad track');
+    return p;
+  })();
+  var LANE = [
+    [[1, 7], [2, 7], [3, 7], [4, 7], [5, 7]],
+    [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]],
+    [[13, 7], [12, 7], [11, 7], [10, 7], [9, 7]],
+    [[7, 13], [7, 12], [7, 11], [7, 10], [7, 9]]
+  ];
+  var BASEO = [[0, 0], [9, 0], [9, 9], [0, 9]];
+  var SPOT = [[2, 2], [4, 2], [2, 4], [4, 4]];
+  var FINDIR = [[-1, 0], [0, -1], [1, 0], [0, 1]];
+
+  function relXY(col, rel, pc) {
+    if (rel < 0) return [BASEO[col][0] + SPOT[pc][0], BASEO[col][1] + SPOT[pc][1]];
+    if (rel <= 50) { var t = TRACK[(col * 13 + rel) % NT]; return [t[0] + 0.5, t[1] + 0.5]; }
+    if (rel <= 55) { var l = LANE[col][rel - 51]; return [l[0] + 0.5, l[1] + 0.5]; }
+    return [7.5 + FINDIR[col][0] * 0.85, 7.5 + FINDIR[col][1] * 0.85];
+  }
+
+  function star(x, y, r, fill) {
+    var pts = [], i;
+    for (i = 0; i < 10; i++) {
+      var a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.42 : r;
+      pts.push((x + Math.cos(a) * rr).toFixed(3) + ',' + (y + Math.sin(a) * rr).toFixed(3));
+    }
+    return '<polygon points="' + pts.join(' ') + '" fill="' + fill + '"/>';
+  }
+
+  function boardSVG(active) {
+    var s = '<svg class="lg-svg" viewBox="0 0 15 15" aria-hidden="true" focusable="false">', c, i;
+    s += '<rect width="15" height="15" fill="var(--lg-bg)"/>';
+    for (c = 0; c < 4; c++) {
+      var o = BASEO[c], on = active.indexOf(c) >= 0;
+      s += '<rect x="' + (o[0] + 0.15) + '" y="' + (o[1] + 0.15) + '" width="5.7" height="5.7" rx="0.8" fill="' + COL[c] + '" opacity="' + (on ? 0.95 : 0.3) + '"/>';
+      s += '<rect x="' + (o[0] + 1) + '" y="' + (o[1] + 1) + '" width="4" height="4" rx="0.7" fill="var(--lg-cell)" opacity="' + (on ? 1 : 0.6) + '"/>';
+      for (i = 0; i < 4; i++) s += '<circle cx="' + (o[0] + SPOT[i][0]) + '" cy="' + (o[1] + SPOT[i][1]) + '" r="0.6" fill="' + COL[c] + '" opacity="' + (on ? 0.28 : 0.1) + '" stroke="' + COL[c] + '" stroke-width="0.06"/>';
+    }
+    for (i = 0; i < NT; i++) {
+      var t = TRACK[i], st = i % 13 === 0, stx = i % 13 === 8;
+      s += '<rect x="' + t[0] + '" y="' + t[1] + '" width="1" height="1" fill="' + (st ? COL[i / 13] : 'var(--lg-cell)') + '"' + (st ? ' opacity="0.9"' : '') + ' stroke="var(--lg-line)" stroke-width="0.05"/>';
+      if (stx) s += star(t[0] + 0.5, t[1] + 0.5, 0.36, 'var(--lg-line)');
+      if (st) s += star(t[0] + 0.5, t[1] + 0.5, 0.3, '#fff');
+    }
+    for (c = 0; c < 4; c++) {
+      for (i = 0; i < 5; i++) {
+        var l = LANE[c][i];
+        s += '<rect x="' + l[0] + '" y="' + l[1] + '" width="1" height="1" fill="' + COL[c] + '" opacity="0.62" stroke="var(--lg-line)" stroke-width="0.05"/>';
+      }
+    }
+    s += '<polygon points="6,6 7.5,7.5 6,9" fill="' + COL[0] + '"/><polygon points="6,6 9,6 7.5,7.5" fill="' + COL[1] + '"/>' +
+      '<polygon points="9,6 9,9 7.5,7.5" fill="' + COL[2] + '"/><polygon points="6,9 9,9 7.5,7.5" fill="' + COL[3] + '"/>' +
+      '<rect x="6" y="6" width="3" height="3" fill="none" stroke="var(--lg-line)" stroke-width="0.06"/>';
+    return s + '</svg>';
+  }
+
+  // ---------- âm thanh ----------
+  var AC = null;
+  function tone(f, d, type, v, delay) {
+    if (!S.sound) return;
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      var o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime + (delay || 0);
+      o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(v || 0.06, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d + 0.03);
+    } catch (e) { /* audio unavailable */ }
+  }
+  function sfx(k) {
+    if (k === 'step') tone(520 + Math.random() * 60, 0.05, 'triangle', 0.04);
+    else if (k === 'roll') tone(200 + Math.random() * 200, 0.04, 'square', 0.03);
+    else if (k === 'out') { tone(523, 0.08, 'triangle', 0.06); tone(784, 0.12, 'triangle', 0.06, 0.08); }
+    else if (k === 'cap') { tone(300, 0.12, 'sawtooth', 0.06); tone(150, 0.25, 'sawtooth', 0.06, 0.1); }
+    else if (k === 'home') { tone(660, 0.1, 'sine', 0.07); tone(880, 0.1, 'sine', 0.07, 0.09); tone(1175, 0.2, 'sine', 0.07, 0.18); }
+    else if (k === 'win') { [523, 659, 784, 1046].forEach(function (f, i) { tone(f, 0.2, 'triangle', 0.07, i * 0.12); }); }
+  }
+
+  // ---------- thiết lập / lưu ----------
+  function preset(kind) {
+    var old = S.seats;
+    S.seats = [];
+    for (var i = 0; i < 4; i++) {
+      var ai = kind === 'ai' ? i > 0 : false;
+      S.seats.push({ name: kind === 'ai' ? (i === 0 ? 'Bạn' : 'Máy ' + (i + 1)) : 'Người chơi ' + (i + 1), ai: ai, ico: (old && old[i] && old[i].ico) || LICO[i] });
+    }
+  }
+  function presetKind() {
+    var s = S.seats.slice(0, S.count);
+    if (!s[0].ai && s.slice(1).every(function (x) { return x.ai; })) return 'ai';
+    if (s.every(function (x) { return !x.ai; })) return 'local';
+    return '';
+  }
+  function uniqueIcons() {
+    var used = {};
+    S.seats.slice(0, S.count).forEach(function (st) {
+      if (!st.ico || used[st.ico] || LICO.indexOf(st.ico) < 0) {
+        for (var j = 0; j < LICO.length; j++) if (!used[LICO[j]]) { st.ico = LICO[j]; break; }
+      }
+      used[st.ico] = 1;
+    });
+  }
+  function loadSettings() {
+    preset('ai');
+    try {
+      var o = JSON.parse(localStorage.getItem('lg-settings') || 'null');
+      if (!o) return;
+      if (LV[o.level]) S.level = o.level;
+      if (o.count >= 2 && o.count <= 4) S.count = o.count;
+      S.sound = o.sound !== false;
+      if (Array.isArray(o.seats) && o.seats.length === 4) {
+        S.seats = o.seats.map(function (x, ix) { return { name: String(x.name || '').slice(0, 14), ai: !!x.ai, ico: LICO.indexOf(x.ico) >= 0 ? x.ico : LICO[ix] }; });
+      }
+    } catch (e) { /* storage unavailable */ }
+  }
+  function saveSettings() {
+    try { localStorage.setItem('lg-settings', JSON.stringify({ seats: S.seats, count: S.count, level: S.level, sound: S.sound })); } catch (e) { /* ignore */ }
+  }
+  function save() {
+    try {
+      if (S.G && S.G.phase !== 'over') localStorage.setItem('lg-save', JSON.stringify({ G: S.G }));
+      else localStorage.removeItem('lg-save');
+    } catch (e) { /* ignore */ }
+  }
+  function readSave() {
+    try {
+      var o = JSON.parse(localStorage.getItem('lg-save') || 'null');
+      if (o && o.G && o.G.players && o.G.pcs && o.G.pcs.length === o.G.players.length && o.G.phase !== 'over') return o.G;
+    } catch (e) { /* ignore */ }
+    return null;
+  }
+
+  function renderSetup() {
+    uniqueIcons();
+    var pk = presetKind(), anyAI = S.seats.slice(0, S.count).some(function (s) { return s.ai; }), sv = readSave(), i;
+    var h = '<h2 class="tp-h">Thiết lập ván chơi</h2><p class="tp-lead">Mỗi người có 4 ngựa. Tung 6 để xuất chuồng, đá ngựa đối thủ và là người đầu tiên đưa cả 4 ngựa về đích. Bấm vào biểu tượng để chọn con ngựa của bạn.</p>';
+    if (sv) h += '<div class="actions">' + btn('Tiếp tục ván đang chơi (' + sv.players.length + ' người)', 'resume', 'good') + '</div>';
+    h += '<div class="field"><span class="label">Chế độ</span><div class="seg">' +
+      '<button type="button" data-lg="preset" data-v="ai" aria-pressed="' + (pk === 'ai') + '">Chơi với máy</button>' +
+      '<button type="button" data-lg="preset" data-v="local" aria-pressed="' + (pk === 'local') + '">Nhiều người một máy</button></div></div>';
+    h += '<div class="field"><span class="label">Số người chơi</span><div class="seg">';
+    for (i = 2; i <= 4; i++) h += '<button type="button" data-lg="count" data-v="' + i + '" aria-pressed="' + (S.count === i) + '">' + i + '</button>';
+    h += '</div></div><div class="tp-seats">';
+    var cols = LG.COLS_BY_N[S.count];
+    S.seats.slice(0, S.count).forEach(function (s, k) {
+      var c = cols[k];
+      h += '<div class="tp-seat"><button type="button" class="ico-btn" data-lg="pickico" data-i="' + k + '" aria-expanded="' + (S.pick === k) + '" aria-label="Chọn biểu tượng cho người chơi ' + (k + 1) + '">' +
+        '<span class="pdot" style="--c:' + COL[c] + '">' + s.ico + '</span><span class="ico-edit">Đổi</span></button>' +
+        '<input class="tp-name" data-seat="' + k + '" maxlength="14" value="' + esc(s.name) + '" aria-label="Tên người chơi ' + (k + 1) + '">' +
+        '<span class="lg-colname" style="color:' + COL[c] + '">' + COLN[c] + '</span>' +
+        '<div class="seg"><button type="button" data-lg="seat" data-i="' + k + '" data-v="h" aria-pressed="' + (!s.ai) + '">Người</button>' +
+        '<button type="button" data-lg="seat" data-i="' + k + '" data-v="a" aria-pressed="' + s.ai + '">Máy</button></div></div>';
+      if (S.pick === k) {
+        h += '<div class="ico-grid" role="group" aria-label="Chọn biểu tượng">';
+        LICO.forEach(function (ic) {
+          var used = S.seats.slice(0, S.count).some(function (o, j) { return j !== k && o.ico === ic; });
+          h += '<button type="button" class="ico-opt" data-lg="setico" data-i="' + k + '" data-v="' + ic + '" aria-pressed="' + (s.ico === ic) + '"' + (used ? ' disabled' : '') + '>' + ic + '</button>';
+        });
+        h += '</div>';
+      }
+    });
+    h += '</div>';
+    if (anyAI) {
+      h += '<div class="field"><span class="label">Độ khó của máy</span><div class="seg">';
+      Object.keys(LV).forEach(function (k) { h += '<button type="button" data-lg="level" data-v="' + k + '" aria-pressed="' + (S.level === k) + '">' + LV[k] + '</button>'; });
+      h += '</div></div>';
+    }
+    h += '<div class="actions"><button type="button" class="btn primary" data-lg="start">Bắt đầu chơi</button></div>';
+    $('lgSetup').innerHTML = h;
+  }
+
+  function stopAll() {
+    S.gen++;
+    clearTimeout(S.timer); clearTimeout(S.aiTimer);
+    S.busy = false; S.anim = false;
+  }
+  function showSetup() {
+    stopAll();
+    S.G = null;
+    $('lgSetup').hidden = false; $('lgPlay').hidden = true;
+    $('lgPlayers').hidden = true; $('lgActions').hidden = true; $('lgLogBox').hidden = true;
+    renderSetup();
+  }
+  function enterPlay() {
+    $('lgSetup').hidden = true; $('lgPlay').hidden = false;
+    $('lgPlayers').hidden = false; $('lgActions').hidden = false; $('lgLogBox').hidden = false;
+    buildBoard();
+    syncToggles();
+    render();
+    pump();
+  }
+  function startGame() {
+    stopAll();
+    var players = S.seats.slice(0, S.count).map(function (s, i) {
+      var nm = String(s.name || '').trim() || (s.ai ? 'Máy ' + (i + 1) : 'Người chơi ' + (i + 1));
+      return { name: nm, ai: s.ai, ico: s.ico };
+    });
+    saveSettings();
+    S.G = LG.create({ players: players, level: S.level, seed: (Math.random() * 4294967296) | 0 });
+    S.disp = S.G.pcs.map(function (a) { return a.slice(); });
+    S.hideOver = false; S.pick = null;
+    enterPlay(); save();
+  }
+  function resumeGame() {
+    var sv = readSave();
+    if (!sv) return;
+    stopAll();
+    S.G = sv; S.disp = sv.pcs.map(function (a) { return a.slice(); });
+    S.hideOver = false; S.pick = null;
+    enterPlay();
+  }
+  function syncToggles() { $('lgSndBtn').setAttribute('aria-pressed', String(S.sound)); }
+
+  // ---------- bàn cờ ----------
+  function cubeHTML() {
+    var f = '';
+    for (var n = 1; n <= 6; n++) {
+      var on = PIPS[n], p = '';
+      for (var k = 1; k <= 9; k++) p += '<i' + (on.indexOf(k) >= 0 ? ' class="on"' : '') + '></i>';
+      f += '<span class="cf f' + n + '">' + p + '</span>';
+    }
+    return '<div class="scene" id="lgScene"><div class="cube" id="lgCube">' + f + '</div><span class="dshadow"></span></div>';
+  }
+
+  function buildBoard() {
+    var G = S.G, active = G.players.map(function (p) { return p.col; }), h = '<div class="lg-board" id="lgBoard">' + boardSVG(active) +
+      '<div class="lg-hints" id="lgHints"></div><div class="lg-tokens" id="lgTok">';
+    G.players.forEach(function (p, pid) {
+      for (var pc = 0; pc < 4; pc++) {
+        h += '<button type="button" class="lg-tk" data-lg="tk" data-p="' + pid + '" data-pc="' + pc + '" style="--c:' + COL[p.col] + '" tabindex="-1" aria-label="' + esc(p.name) + ', ngựa ' + (pc + 1) + '"><span class="lg-tk-in">' + esc(p.ico || LICO[pid]) + '</span></button>';
+      }
+    });
+    h += '</div><div class="ov" id="lgOv"></div></div>' +
+      '<div class="lg-bar"><div class="lg-dice" id="lgDice">' + cubeHTML() + '<span class="sr" id="lgDieTxt"></span></div>' +
+      '<div class="lg-turn" id="lgTurn" aria-live="polite"></div><div class="lg-btns" id="lgBtns"></div></div>';
+    $('lgPlay').innerHTML = h;
+    var b = BASE[G.die] || BASE[1]; S.cx = b[0]; S.cy = b[1]; S.anim = false;
+    S.sig = '';
+  }
+
+  function layoutAll(mvPid, mvPc, ms) {
+    var G = S.G, groups = {};
+    G.players.forEach(function (p, pid) {
+      for (var pc = 0; pc < 4; pc++) {
+        var rel = S.disp[pid][pc], xy = relXY(p.col, rel, pc);
+        var key = rel < 0 ? 'b' + pid + '-' + pc : rel >= HOME ? 'f' + pid : Math.round(xy[0] * 2) + ',' + Math.round(xy[1] * 2);
+        (groups[key] = groups[key] || []).push({ pid: pid, pc: pc, rel: rel, xy: xy, col: p.col });
+      }
+    });
+    var K = 100 / 15;
+    Object.keys(groups).forEach(function (k) {
+      var g = groups[k], n = g.length;
+      g.forEach(function (it, i) {
+        var off = [0, 0], sc = 1;
+        if (it.rel >= HOME) {
+          var fd = FINDIR[it.col], perp = [Math.abs(fd[1]), Math.abs(fd[0])], d = (i - (n - 1) / 2) * 0.42;
+          off = [perp[0] * d, perp[1] * d]; sc = 0.55;
+        } else if (n > 1) {
+          var c = Math.ceil(Math.sqrt(n)), r = Math.ceil(n / c), sp = 0.92 / c;
+          off = [((i % c) - (c - 1) / 2) * sp, (Math.floor(i / c) - (r - 1) / 2) * sp];
+          sc = Math.min(1, 1.05 / c);
+        }
+        var el = document.querySelector('#lgTok .lg-tk[data-p="' + it.pid + '"][data-pc="' + it.pc + '"]');
+        if (!el) return;
+        el.style.transitionDuration = (it.pid === mvPid && it.pc === mvPc && ms) ? ms + 'ms' : '';
+        el.style.left = (it.xy[0] * K) + '%';
+        el.style.top = (it.xy[1] * K) + '%';
+        el.style.setProperty('--dx', (off[0] * K) + 'cqw');
+        el.style.setProperty('--dy', (off[1] * K) + 'cqw');
+        el.style.setProperty('--sc', sc);
+        el.style.zIndex = (it.pid === mvPid && it.pc === mvPc) ? 6 : (it.rel >= HOME ? 2 : 3 + (it.rel > 0 ? 0 : 0));
+      });
+    });
+  }
+  function fxTok(pid, pc, cls) {
+    var el = document.querySelector('#lgTok .lg-tk[data-p="' + pid + '"][data-pc="' + pc + '"] .lg-tk-in');
+    if (!el) return;
+    el.classList.remove('hop', 'land', 'hit'); void el.offsetWidth; el.classList.add(cls);
+  }
+
+  // ---------- xúc xắc 3D ----------
+  function nextAngle(cur, t, spins) { return t + 360 * (Math.ceil((cur - t) / 360) + spins); }
+  function renderDice() {
+    var c = $('lgCube');
+    if (!c) return;
+    var d = S.G.die || 1;
+    $('lgDieTxt').textContent = 'Xúc xắc: ' + d;
+    if (S.anim) return;
+    var b = BASE[d] || BASE[1];
+    S.cx = nextAngle(S.cx, b[0], 0); S.cy = nextAngle(S.cy, b[1], 0);
+    c.style.transition = 'none';
+    c.style.transform = 'rotateX(' + S.cx + 'deg) rotateY(' + S.cy + 'deg)';
+  }
+  function tumble(v, cb) {
+    var c = $('lgCube'), sc = $('lgScene'), gen = S.gen;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!c) { cb(); return; }
+    var b = BASE[v] || BASE[1];
+    S.cx = nextAngle(S.cx, b[0], 2); S.cy = nextAngle(S.cy, b[1], 3);
+    S.anim = true;
+    if (!reduce) {
+      sc.classList.remove('toss'); void sc.offsetWidth; sc.classList.add('toss');
+      for (var k = 0; k < 7; k++) (function (kk) { setTimeout(function () { if (gen === S.gen && S.anim) sfx('roll'); }, kk * 150); })(k);
+    }
+    void c.offsetWidth;
+    c.style.transition = reduce ? 'none' : 'transform 1.25s cubic-bezier(.14,.72,.2,1)';
+    c.style.transform = 'rotateX(' + S.cx + 'deg) rotateY(' + S.cy + 'deg)';
+    S.timer = setTimeout(function () {
+      if (gen !== S.gen) return;
+      S.anim = false; sc.classList.remove('toss'); cb();
+    }, reduce ? 40 : 1450);
+  }
+
+  // ---------- hiển thị ----------
+  function actor() { return S.G.players[S.G.turn]; }
+  function humanMoving() { var G = S.G; return !!G && G.phase === 'move' && !actor().ai && !S.busy; }
+
+  function renderTokens() {
+    var G = S.G, legalPcs = {}, hints = '';
+    if (!S.busy) S.disp = G.pcs.map(function (a) { return a.slice(); });
+    layoutAll(-1, -1, 0);
+    var can = humanMoving();
+    if (can) {
+      G.legal.forEach(function (m) { legalPcs[G.pcs[G.turn][m.pc]] = m; });
+      var p = actor();
+      G.legal.forEach(function (m) {
+        var xy = relXY(p.col, m.to, m.pc), K = 100 / 15;
+        hints += '<button type="button" class="lg-hint" data-lg="hint" data-pc="' + m.pc + '" style="left:' + (xy[0] * K) + '%;top:' + (xy[1] * K) + '%;--c:' + COL[p.col] + '" aria-label="Đi tới đây"></button>';
+      });
+    }
+    $('lgHints').innerHTML = hints;
+    var toks = document.querySelectorAll('#lgTok .lg-tk');
+    for (var i = 0; i < toks.length; i++) {
+      var el = toks[i], pid = +el.getAttribute('data-p'), pc = +el.getAttribute('data-pc');
+      var ok = can && pid === G.turn && !!legalPcs[G.pcs[pid][pc]];
+      el.classList.toggle('can', ok);
+      el.classList.toggle('turn', G.phase !== 'over' && pid === G.turn);
+      el.tabIndex = ok ? 0 : -1;
+    }
+  }
+
+  function renderBar() {
+    var G = S.G, t = '', b = '';
+    if (G.phase === 'over') {
+      t = '<b>' + chip(G.winner) + esc(G.players[G.winner].name) + ' thắng!</b><span class="lg-msg">Ván đã kết thúc.</span>';
+      b = btn('Ván mới', 'setup', 'primary');
+    } else {
+      var p = actor(), last = G.log.length ? G.log[G.log.length - 1].t : '';
+      t = '<b>' + chip(p.id) + esc(p.name) + (p.ai ? ' <small>(máy)</small>' : '') + '</b>';
+      if (p.ai) t += '<span class="lg-msg thinking">Máy đang nghĩ<i></i><i></i><i></i></span>';
+      else if (G.phase === 'roll') t += '<span class="lg-msg">Đến lượt bạn, hãy tung xúc xắc.</span>';
+      else t += '<span class="lg-msg">Bạn tung được ' + G.die + '. ' + (G.legal.length > 1 ? 'Chọn một ngựa để đi (các ô gợi ý đang nhấp nháy).' : 'Chỉ có một nước đi.') + '</span>';
+      if (!p.ai && G.phase === 'roll') b = btn('Tung xúc xắc', 'roll', 'primary');
+      t += '<span class="lg-last">' + esc(last) + '</span>';
+    }
+    $('lgTurn').innerHTML = t;
+    $('lgBtns').innerHTML = b;
+  }
+
+  function renderPlayers() {
+    var G = S.G, h = '';
+    G.players.forEach(function (p, i) {
+      var pips = '';
+      for (var pc = 0; pc < 4; pc++) {
+        var r = G.pcs[i][pc];
+        pips += '<b class="' + (r === HOME ? 'h' : r < 0 ? 's' : 't') + '"></b>';
+      }
+      h += '<div class="pl' + (i === G.turn && G.phase !== 'over' ? ' cur' : '') + '" style="--pc:' + COL[p.col] + '">' +
+        '<span class="pl-n">' + chip(i) + '<span class="pl-nm">' + esc(p.name) + '</span>' + (p.ai ? '<small>Máy</small>' : '') + '</span>' +
+        '<span class="pl-c">' + LG.homeCount(G, i) + '/4 về đích</span>' +
+        '<span class="pl-s">' + COLN[p.col] + ' · chuồng ' + G.pcs[i].filter(function (r) { return r < 0; }).length + '</span>' +
+        '<span class="lg-pips" aria-hidden="true">' + pips + '</span></div>';
+    });
+    $('lgPlayers').innerHTML = h;
+  }
+
+  function renderLog() {
+    var ol = $('lgLog');
+    ol.innerHTML = S.G.log.slice(-50).map(function (e) {
+      return '<li><i style="background:' + (e.p >= 0 ? COL[S.G.players[e.p].col] : 'var(--line)') + '"></i><span>' + esc(e.t) + '</span></li>';
+    }).join('');
+    ol.scrollTop = ol.scrollHeight;
+  }
+
+  function confetti() {
+    var cols = ['#e0453b', '#2fa75f', '#f2b91c', '#2c7be0'], s = '<div class="confetti" aria-hidden="true">';
+    for (var i = 0; i < 34; i++) {
+      s += '<i style="--x:' + (Math.random() * 100).toFixed(1) + '%;--r:' + ((Math.random() * 360) | 0) + 'deg;--d:' + (1.6 + Math.random() * 1.4).toFixed(2) + 's;--dl:' + (0.7 + Math.random() * 0.9).toFixed(2) + 's;--c:' + cols[i % cols.length] + '"></i>';
+    }
+    return s + '</div>';
+  }
+  function renderOver() {
+    var G = S.G, el = $('lgOv');
+    if (G.phase !== 'over' || S.hideOver) { el.innerHTML = ''; return; }
+    var w = G.players[G.winner], rank = LG.standings(G);
+    el.innerHTML = '<div class="result" role="status">' + (w.ai ? '' : confetti()) +
+      '<div class="result-card"><div class="result-title">' + esc(w.name) + ' thắng</div><div class="result-sub">Đã đưa đủ 4 ngựa về đích.</div>' +
+      '<div class="ov-rank">' + rank.map(function (r, i) {
+        return '<div><span>' + (i + 1) + '. ' + chip(r.id) + ' ' + esc(G.players[r.id].name) + '</span><b>' + r.home + '/4 về đích</b></div>';
+      }).join('') + '</div>' +
+      '<div class="result-actions"><button type="button" class="btn primary" data-lg="setup">Ván mới</button><button type="button" class="btn" data-lg="closeov">Xem bàn cờ</button></div></div></div>';
+  }
+
+  function render() {
+    renderDice(); renderTokens(); renderBar(); renderPlayers(); renderLog(); renderOver();
+  }
+
+  // ---------- điều khiển ----------
+  function request(a) {
+    if (S.busy || !S.G || S.G.phase === 'over') return;
+    run(a);
+  }
+
+  function run(a) {
+    var G = S.G, gen = S.gen;
+    if (!LG.act(G, a)) { render(); pump(); return; }
+    S.busy = true;
+    if (a.a === 'roll') {
+      tumble(G.die, function () {
+        S.busy = false; render(); save();
+        pump();
+      });
+      return;
+    }
+    var L = G.last, pid = L.pid, pc = L.pc, steps = [], k;
+    if (L.from < 0) steps.push({ rel: 0, ms: 480, t: 540 });
+    else for (k = L.from + 1; k <= L.to; k++) steps.push({ rel: k, ms: STEP - 20, t: STEP });
+    var out = L.from < 0;
+    (function next() {
+      if (gen !== S.gen) return;
+      var st = steps.shift();
+      if (!st) { arrive(); return; }
+      S.disp[pid][pc] = st.rel;
+      layoutAll(pid, pc, st.ms);
+      if (out) sfx('out'); else sfx('step');
+      if (steps.length) fxTok(pid, pc, 'hop');
+      S.timer = setTimeout(next, st.t);
+    })();
+    function arrive() {
+      fxTok(pid, pc, 'land');
+      var wait = 220;
+      if (L.to === HOME) sfx('home');
+      if (L.cap.length) {
+        wait = 900;
+        sfx('cap');
+        setTimeout(function () {
+          if (gen !== S.gen) return;
+          L.cap.forEach(function (c) { fxTok(c.pid, c.pc, 'hit'); });
+        }, 80);
+        setTimeout(function () {
+          if (gen !== S.gen) return;
+          L.cap.forEach(function (c) { S.disp[c.pid][c.pc] = -1; layoutAll(c.pid, c.pc, FLY); });
+        }, 420);
+      }
+      S.timer = setTimeout(function () {
+        if (gen !== S.gen) return;
+        S.busy = false; render(); save();
+        if (G.phase === 'over') sfx('win');
+        pump();
+      }, wait + (L.cap.length ? 300 : 0));
+    }
+  }
+
+  function pump() {
+    clearTimeout(S.aiTimer);
+    var G = S.G;
+    if (!G || S.busy || G.phase === 'over') return;
+    var gen = S.gen, p = actor();
+    if (p.ai) {
+      S.aiTimer = setTimeout(function () {
+        if (gen !== S.gen || S.busy || !S.G || !visible()) return;
+        var a = LG.aiChoose(S.G);
+        if (a) request(a);
+      }, G.phase === 'roll' ? 750 : 650);
+    } else if (G.phase === 'move' && G.legal.length === 1) {
+      S.aiTimer = setTimeout(function () {
+        if (gen !== S.gen || S.busy || !S.G || !visible()) return;
+        if (S.G.phase === 'move' && S.G.legal.length === 1) request({ a: 'move', pc: S.G.legal[0].pc });
+      }, 700);
+    }
+  }
+
+  root().addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target.closest('[data-lg]') : null;
+    if (!t || t.disabled) return;
+    var k = t.getAttribute('data-lg'), v = t.getAttribute('data-v'), i = +t.getAttribute('data-i');
+    switch (k) {
+      case 'preset': preset(v); renderSetup(); break;
+      case 'count': S.count = +v; renderSetup(); break;
+      case 'seat':
+        S.seats[i].ai = v === 'a';
+        if (S.seats[i].ai && /^Người chơi \d$|^Bạn$/.test(S.seats[i].name)) S.seats[i].name = 'Máy ' + (i + 1);
+        else if (!S.seats[i].ai && /^Máy \d$/.test(S.seats[i].name)) S.seats[i].name = 'Người chơi ' + (i + 1);
+        renderSetup(); break;
+      case 'pickico': S.pick = S.pick === i ? null : i; renderSetup(); break;
+      case 'setico': S.seats[i].ico = v; S.pick = null; renderSetup(); break;
+      case 'level': S.level = v; renderSetup(); break;
+      case 'start': startGame(); break;
+      case 'resume': resumeGame(); break;
+      case 'setup': try { localStorage.removeItem('lg-save'); } catch (err) { /* ignore */ } showSetup(); break;
+      case 'snd': S.sound = !S.sound; saveSettings(); syncToggles(); sfx('home'); break;
+      case 'closeov': S.hideOver = true; renderOver(); break;
+      case 'roll':
+        if (S.G && !actor().ai && S.G.phase === 'roll') request({ a: 'roll' });
+        break;
+      case 'tk': {
+        var pid = +t.getAttribute('data-p'), pc = +t.getAttribute('data-pc');
+        if (S.G && humanMoving() && pid === S.G.turn) request({ a: 'move', pc: pc });
+        break;
+      }
+      case 'hint':
+        if (S.G && humanMoving()) request({ a: 'move', pc: +t.getAttribute('data-pc') });
+        break;
+    }
+  });
+  root().addEventListener('input', function (e) {
+    var t = e.target;
+    if (t.getAttribute && t.getAttribute('data-seat') !== null) S.seats[+t.getAttribute('data-seat')].name = t.value;
+  });
+
+  window.__lgStart = function () {
+    if (!S.started) { S.started = true; loadSettings(); showSetup(); }
+    else if (S.G) pump();
+  };
+  window.__lgDebug = { S: S, LG: LG, render: render };
+})();
+</script>
+<script>
 (function () {
   'use strict';
   var home = document.getElementById('view-home');
-  var views = { 'co-tuong': document.getElementById('view-xiangqi'), 'co-vua': document.getElementById('view-chess'), 'ty-phu': document.getElementById('view-tycoon') };
-  var starters = { 'co-tuong': '__xqStart', 'co-vua': '__chStart', 'ty-phu': '__tpStart' };
+  var views = { 'co-tuong': document.getElementById('view-xiangqi'), 'co-vua': document.getElementById('view-chess'), 'ty-phu': document.getElementById('view-tycoon'), 'ca-ngua': document.getElementById('view-ludo') };
+  var starters = { 'co-tuong': '__xqStart', 'co-vua': '__chStart', 'ty-phu': '__tpStart', 'ca-ngua': '__lgStart' };
   var current = null;
   function route() {
     var h = (location.hash || '').replace('#', '');
